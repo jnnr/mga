@@ -176,7 +176,7 @@ logging.info("Solve the optimization problem")
 om.solve(solver="cbc", solve_kwargs={"tee": True})
 
 from mga import do_mga
-do_mga(om, 0.05)
+do_mga(om, 0.05, condition=lambda x: x.label == 'wind')
 
 ##########################################################################
 # Check and plot the results

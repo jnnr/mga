@@ -14,7 +14,7 @@ def add_max_cost_constraint(model, max_cost):
     return model
 
 
-def set_new_objective(model):
+def set_new_objective(model, condition):
 
     def obj_expr():
         # Hier will ich auf die Investflow invest variablen zugreifen, nach bestimmten sorten filtern und
@@ -22,14 +22,10 @@ def set_new_objective(model):
         expr = 0
 
         for i, o in model.InvestmentFlow.CONVEX_INVESTFLOWS:
-            expr += (
-                model.InvestmentFlow.invest[i, o]
-            )
-            
-            print(type(i))
-
-        # Dies hier scheint nicht nötig zu sein? Wirft jedenfalls einen Fehler.
-        #expr = po.Expression(expr)
+            if condition(i):
+                expr += (
+                    model.InvestmentFlow.invest[i, o]
+                )
 
         return expr
 
@@ -38,7 +34,7 @@ def set_new_objective(model):
     return model
 
 
-def do_mga(om, slack):
+def do_mga(om, slack, condition):
 
     # get the value of the objective function
     objective_value = om.objective.expr()
@@ -50,7 +46,7 @@ def do_mga(om, slack):
 
     add_max_cost_constraint(om, max_cost)
 
-    set_new_objective(om)
+    set_new_objective(om, condition)
 
     om.write('/home/jann/Desktop/file.lp', io_options={"symbolic_solver_labels": True})
 
