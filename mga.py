@@ -1,7 +1,27 @@
-import pyomo.environ as po
 import copy
 
+import pyomo.environ as po
+
+
 def add_max_cost_constraint(model, max_cost):
+    r"""
+    Takes an instance of oemof.solph.Model and an upper
+    bound to the model objective.
+
+    Parameters
+    ----------
+
+    model : oemof.solph.Model
+        Model to which the constraint should be added.
+
+    max_cost : numeric
+        Value of the upper bound on the objective.
+
+    Returns
+    -------
+    model : oemof.solph.Model
+        Model with extra constraint.
+    """
     def max_cost_func(m):
         return model.objective <= max_cost
 
@@ -14,11 +34,53 @@ def add_max_cost_constraint(model, max_cost):
     return model
 
 
-def set_new_objective(model, condition):
+def set_new_objective(model, obj_expr):
+    r"""
+    Set a new objective to a model.
 
-    def obj_expr():
-        # Hier will ich auf die Investflow invest variablen zugreifen, nach bestimmten sorten filtern und
-        # die dann maximieren
+    Parameters
+    ----------
+
+    model : oemof.solph.Model
+        Model for which the new objective should be set.
+
+    obj_expr : func
+        New objective.
+
+    Returns
+    -------
+    model : oemof.solph.Model
+        Model with new objective.
+    """
+
+    model.objective = po.Objective(sense=po.maximize, expr=obj_expr())
+
+    return model
+
+
+def set_obj_max_investflows(model, condition):
+    r"""
+    Sets the new objective to maximize the investflows that match a
+    condition.
+
+    Parameters
+    ----------
+
+    model : oemof.solph.Model
+        Model for which the new objective should be set.
+
+    condition : func
+        Condition to match.
+
+    Returns
+    -------
+    model : oemof.solph.Model
+        Model with new objective.
+    """
+    def maximize_invest_flows():
+        r"""
+        Maximize investflows that match the condition.
+        """
         expr = 0
 
         for i, o in model.InvestmentFlow.CONVEX_INVESTFLOWS:
@@ -29,32 +91,33 @@ def set_new_objective(model, condition):
 
         return expr
 
-    model.objective = po.Objective(sense=po.maximize, expr=obj_expr())
+    set_new_objective(model, maximize_invest_flows)
 
     return model
 
 
-def do_mga(om, slack, condition):
+def do_mga(model, slack, condition):
+    r"""
+    Perform a modeling-to-generate-alternatives sampling.
 
+    Parameters
+    ----------
+    model : oemof.solph.Model
+
+    slack : numeric
+
+    condition :
+    """
     # get the value of the objective function
-    objective_value = om.objective.expr()
+    objective_value = model.objective.expr()
 
-    # make former objective a constraint + slack
-    function = copy.deepcopy(om.objective.expr)
-
+    # define max cost as minimal cost plus some tolerance.
     max_cost = (1 + slack) * objective_value
 
-    add_max_cost_constraint(om, max_cost)
+    # set an upper bound on the cost
+    add_max_cost_constraint(model, max_cost)
 
-    set_new_objective(om, condition)
+    # set a new objective
+    set_obj_max_investflows(model, condition)
 
-    om.write('/home/jann/Desktop/file.lp', io_options={"symbolic_solver_labels": True})
-
-    om.solve(solver="cbc", solve_kwargs={"tee": True})
-
-    print(om.objective.expr)
-
-    print(function() * (1+slack))
-    print(objective_value * (1 + slack))
-
-    import sys; sys.exit()
+    return model
