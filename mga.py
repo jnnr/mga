@@ -6,7 +6,7 @@ import pyomo.environ as po
 def add_max_cost_constraint(model, max_cost):
     r"""
     Takes an instance of oemof.solph.Model and an upper
-    bound to the model objective.
+    bound to the current models objective function.
 
     Parameters
     ----------
