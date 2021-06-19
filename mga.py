@@ -34,7 +34,7 @@ def add_max_cost_constraint(model, max_cost):
     return model
 
 
-def set_new_objective(model, obj_expr):
+def set_new_objective(model, obj_expr, sense='max'):
     r"""
     Set a new objective to a model.
 
@@ -47,13 +47,23 @@ def set_new_objective(model, obj_expr):
     obj_expr : func
         New objective.
 
+    sense : po.maximize or po.minimize
+
     Returns
     -------
     model : oemof.solph.Model
         Model with new objective.
     """
+    if sense == 'min':
+        set_sense = po.minimize
 
-    model.objective = po.Objective(sense=po.maximize, expr=obj_expr())
+    elif sense == 'max':
+        set_sense = po.maximize
+
+    else:
+        raise ValueError("Sense has to be either 'min' or 'max'!")
+
+    model.objective = po.Objective(sense=set_sense, expr=obj_expr())
 
     return model
 
