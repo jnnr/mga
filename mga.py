@@ -94,7 +94,7 @@ def set_obj_max_investflows(model, condition):
         expr = 0
 
         for i, o in model.InvestmentFlow.CONVEX_INVESTFLOWS:
-            if condition(i):
+            if condition((i, o)):
                 expr += (
                     model.InvestmentFlow.invest[i, o]
                 )
@@ -108,7 +108,7 @@ def set_obj_max_investflows(model, condition):
 
 def do_mga(model, slack, condition):
     r"""
-    Perform a modeling-to-generate-alternatives sampling.
+    Setup a modeling-to-generate-alternatives sample.
 
     Parameters
     ----------
@@ -131,3 +131,47 @@ def do_mga(model, slack, condition):
     set_obj_max_investflows(model, condition)
 
     return model
+
+
+def sample_mga(model, slack, labels):
+    import copy
+
+    def condition(flow):
+        return flow[0].label == label
+
+    model.solve()
+
+    print_invest(model)
+
+    objective = model.objective
+
+    print(objective())
+
+    for label in labels:
+        altered_model = copy.deepcopy(model)
+
+        old_objective = altered_model.objective
+
+        altered_model = do_mga(altered_model, slack, condition)
+
+        altered_model.solve()
+
+        print(f'Maximizing investment of capacity for {label}')
+
+        print_invest(altered_model)
+
+        print(old_objective())
+
+
+def print_invest(model):
+    from oemof import solph
+    import pandas as pd
+
+    results = solph.processing.results(model)
+
+    invest = {k: v['scalars']['invest'] for k, v in results.items() if
+              not v['scalars'].empty and 'invest' in v['scalars']}
+
+    invest = pd.Series(invest)
+
+    print(invest)
