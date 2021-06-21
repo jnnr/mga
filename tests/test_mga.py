@@ -3,13 +3,17 @@ import sys
 
 import pandas as pd
 
-from oemof.tools import logger
 from oemof.tools import economics
 from oemof import solph
 
 here = os.path.dirname(__file__)
 sys.path.append(os.path.join(here, '..'))
 import mga
+
+
+tmp = os.path.join(here, 'tmp')
+if not os.path.exists(tmp):
+    os.mkdir(tmp)
 
 
 def create_model():
@@ -107,9 +111,11 @@ def test_set_new_objective():
     def obj_expr():
         return 2
 
-    mga.set_new_objective(om, obj_expr, sense='max')
+    om = mga.set_new_objective(om, obj_expr, sense='max')
 
     # TODO: compare lp-files
+    om.write(os.path.join(tmp, 'set_new_objective.lp'))
+
     assert om.objective.expr() == 2.0
 
 
@@ -120,11 +126,12 @@ def test_add_max_cost_objective():
     def obj_expr():
         return 2
 
-    mga.add_max_cost_constraint(om, 100)
+    om = mga.add_max_cost_constraint(om, 100)
 
-    mga.set_new_objective(om, obj_expr, sense='max')
+    om = mga.set_new_objective(om, obj_expr, sense='max')
 
     # TODO: compare lp-files
+    om.write(os.path.join(tmp, 'add_max_cost_obj.lp'))
     print(om.max_cost.max_cost_rule.expr)
 
 
@@ -135,11 +142,12 @@ def test_permute_add_max_cost_objective():
     def obj_expr():
         return 2
 
-    mga.set_new_objective(om, obj_expr, sense='max')
+    om = mga.set_new_objective(om, obj_expr, sense='max')
 
-    mga.add_max_cost_constraint(om, 100)
+    om = mga.add_max_cost_constraint(om, 100)
 
     # TODO: compare lp-files
+    om.write(os.path.join(tmp, 'permute_add_max_cost_obj.lp'))
     print(om.max_cost.max_cost_rule.expr)
 
 
