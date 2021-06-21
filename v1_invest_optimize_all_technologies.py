@@ -175,5 +175,5 @@ om = solph.Model(energysystem)
 logging.info("Solve the optimization problem")
 
 from mga import sample_mga
-sample_mga(om, 0.05, labels=['wind', 'pv'])
+sample_mga(om, 0.05, labels=['wind', 'pv', 'storage'])
 
