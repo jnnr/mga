@@ -63,6 +63,8 @@ def set_new_objective(model, obj_expr, sense='max'):
     else:
         raise ValueError("Sense has to be either 'min' or 'max'!")
 
+    model.del_component(model.objective)
+
     model.objective = po.Objective(sense=set_sense, expr=obj_expr())
 
     return model
