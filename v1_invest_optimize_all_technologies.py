@@ -67,7 +67,7 @@ import os
 import pandas as pd
 import pprint as pp
 
-number_timesteps = 8760
+number_timesteps = 3
 
 ##########################################################################
 # Initialize the energy system and read/calculate necessary parameters
@@ -174,6 +174,6 @@ om = solph.Model(energysystem)
 # if tee_switch is true solver messages will be displayed
 logging.info("Solve the optimization problem")
 
-from mga import sample_mga
-sample_mga(om, 0.05, labels=['wind', 'pv', 'storage'])
+from mga import solve_mga_sampling
+solve_mga_sampling(om, 0.05, labels=['wind', 'pv', 'storage'])
 

@@ -108,7 +108,7 @@ def set_obj_max_investflows(model, condition):
     return model
 
 
-def do_mga(model, slack, condition):
+def get_sample_by_condition(model, slack, condition):
     r"""
     Setup a modeling-to-generate-alternatives sample.
 
@@ -135,11 +135,18 @@ def do_mga(model, slack, condition):
     return model
 
 
-def sample_mga(model, slack, labels):
-    import copy
+def get_sample_by_source_label(model, slack, label):
 
     def condition(flow):
         return flow[0].label == label
+
+    altered_model = get_sample_by_condition(model, slack, condition)
+
+    return altered_model
+
+
+def solve_mga_sampling(model, slack, labels):
+    import copy
 
     print(f'Solving for global optimum')
 
@@ -156,7 +163,7 @@ def sample_mga(model, slack, labels):
 
         old_objective = altered_model.objective
 
-        altered_model = do_mga(altered_model, slack, condition)
+        altered_model = get_sample_by_source_label(altered_model, slack, label)
 
         print(f'Maximizing investment of capacity for {label}')
 
