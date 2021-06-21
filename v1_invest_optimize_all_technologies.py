@@ -173,36 +173,7 @@ om = solph.Model(energysystem)
 
 # if tee_switch is true solver messages will be displayed
 logging.info("Solve the optimization problem")
-om.solve(solver="cbc", solve_kwargs={"tee": True})
 
-##########################################################################
-# Check and plot the results
-##########################################################################
+from mga import sample_mga
+sample_mga(om, 0.05, labels=['wind', 'pv'])
 
-# check if the new result object is working for custom components
-results = solph.processing.results(om)
-
-custom_storage = solph.views.node(results, "storage")
-electricity_bus = solph.views.node(results, "electricity")
-
-meta_results = solph.processing.meta_results(om)
-pp.pprint(meta_results)
-
-my_results = electricity_bus["scalars"]
-
-# installed capacity of storage in GWh
-my_results["storage_invest_GWh"] = (
-    results[(storage, None)]["scalars"]["invest"] / 1e6
-)
-
-# installed capacity of wind power plant in MW
-my_results["wind_invest_MW"] = results[(wind, bel)]["scalars"]["invest"] / 1e3
-
-# resulting renewable energy share
-my_results["res_share"] = (
-    1
-    - results[(pp_gas, bel)]["sequences"].sum()
-    / results[(bel, demand)]["sequences"].sum()
-)
-
-pp.pprint(my_results)
