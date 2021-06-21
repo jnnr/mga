@@ -139,13 +139,15 @@ def sample_mga(model, slack, labels):
     def condition(flow):
         return flow[0].label == label
 
+    print(f'Solving for global optimum')
+
     model.solve()
 
     print_invest(model)
 
     objective = model.objective
 
-    print(objective())
+    print('Objective value: ', objective())
 
     for label in labels:
         altered_model = copy.deepcopy(model)
@@ -154,13 +156,13 @@ def sample_mga(model, slack, labels):
 
         altered_model = do_mga(altered_model, slack, condition)
 
-        altered_model.solve()
-
         print(f'Maximizing investment of capacity for {label}')
+
+        altered_model.solve()
 
         print_invest(altered_model)
 
-        print(old_objective())
+        print('Objective value: ', old_objective())
 
 
 def print_invest(model):
