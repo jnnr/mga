@@ -8,7 +8,7 @@ The idea of MGA is to investigate alternative solutions
 of an optimization model which can be different in other quantities but have nearly the same
 total system cost as the global optimum.
 
-A well-known approach is the "hop, skip and jump" algorithm (TODO: Add ref), which
+A well-known approach is the "hop, skip and jump" algorithm ([Brill1982]_), which
 finds alternative solutions in the following way: After finding the global optimum
 of a LP, a new constraint is added which sets an upper bound on the total system costs
 such that they are smaller than the optimal value plus some tolerance. Then, the
@@ -33,5 +33,6 @@ Todo: Show plot.
 References
 ----------
 
+.. [Brill1982] Brill, E. Downey, Shoou-Yuh Chang, and Lewis D. Hopkins. "Modeling to Generate Alternatives: The HSJ Approach and an Illustration Using a Problem in Land Use Planning." Management Science 28, no. 3 (1982): 221-35. Accessed July 6, 2021. http://www.jstor.org/stable/2630877.
 .. [Neumann2021] Neumann, Fabian, and Tom Brown. “The Near-Optimal Feasible Space of a Renewable Power System Model. ”Electric Power Systems Research 190 (January 2021): 106690. https://doi.org/10.1016/j.epsr.2020.106690.
 
