@@ -8,7 +8,7 @@ The algorithm is similar to the one described in [1].
 
 Generic functions implementing the main steps of the algorithm (setting an upper
 bound on the cost, replacing the objective function of the model) are to be found
-in :file:`mga.py`_.
+in ``mga.py``.
 
 Have a look at `invest_optimize_all_technologies.py` for an example application.
 
