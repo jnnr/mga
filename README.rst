@@ -4,9 +4,9 @@ Modeling-to-generate alternatives with oemof
 This repo hosts an implementation of a modeling-to-generate-alternatives
 (MGA) algorithm with some examples within the modeling framework oemof.
 
-The idea of MGA is that it might be interesting to know alternative solutions
-of an optimization model which may look very different but have nearly the same
-total system cost as the global optimimum.
+The idea of MGA is to investigate alternative solutions
+of an optimization model which can be different in other quantities but have nearly the same
+total system cost as the global optimum.
 
 A well-known approach is the "hop, skip and jump" algorithm (TODO: Add ref), which
 finds alternative solutions in the following way: After finding the global optimum
