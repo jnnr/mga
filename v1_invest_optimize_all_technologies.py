@@ -57,15 +57,15 @@ __license__ = "GPLv3"
 # Imports
 ###############################################################################
 
-# Default logger of oemof
-from oemof.tools import logger
-from oemof.tools import economics
-from oemof import solph
-
 import logging
 import os
+
 import pandas as pd
-import pprint as pp
+from oemof import solph
+# Default logger of oemof
+from oemof.tools import economics, logger
+
+from mga import solve_mga_sampling
 
 number_timesteps = 3
 
@@ -174,6 +174,5 @@ om = solph.Model(energysystem)
 # if tee_switch is true solver messages will be displayed
 logging.info("Solve the optimization problem")
 
-from mga import solve_mga_sampling
 solve_mga_sampling(om, 0.05, labels=['wind', 'pv', 'storage'])
 
