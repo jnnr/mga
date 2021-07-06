@@ -59,13 +59,15 @@ __license__ = "GPLv3"
 
 import logging
 import os
+import sys
 
 import pandas as pd
 from oemof import solph
 # Default logger of oemof
 from oemof.tools import economics, logger
 
-from mga import solve_mga_sampling
+sys.path.append("../")
+from mga.mga import solve_mga_sampling
 
 number_timesteps = 3
 

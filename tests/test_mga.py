@@ -8,8 +8,7 @@ from oemof import solph
 
 here = os.path.dirname(__file__)
 sys.path.append(os.path.join(here, '..'))
-import mga
-
+from mga import mga
 
 tmp = os.path.join(here, 'tmp')
 if not os.path.exists(tmp):
@@ -22,7 +21,7 @@ def create_model():
     energysystem = solph.EnergySystem(timeindex=date_time_index)
 
     # Read data file
-    full_filename = os.path.join(here, "..", "storage_investment.csv")
+    full_filename = os.path.join(here, "_static", "storage_investment.csv")
     data = pd.read_csv(full_filename, sep=",")
 
     price_gas = 0.04
