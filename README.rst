@@ -23,7 +23,16 @@ Generic functions implementing the main steps of the algorithm (setting an upper
 bound on the cost, replacing the objective function of the model) are to be found
 in ``mga.py``.
 
-Have a look at `invest_optimize_all_technologies.py` for an example application.
+How to use
+----------
+
+Install the requirements listed in requirements.txt in your environment by calling:
+
+.. code-block::
+
+    pip install -r requirements.txt
+
+Then, run ``python invest_optimize_all_technologies.py`` as an example application.
 
 Results
 -------
