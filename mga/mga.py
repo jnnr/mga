@@ -145,14 +145,14 @@ def get_sample_by_source_label(model, slack, label):
     return altered_model
 
 
-def solve_mga_sampling(model, slack, labels):
+def solve_mga_sampling(model, slack, labels, postproc):
     import copy
 
     print(f'Solving for global optimum')
 
     model.solve()
 
-    print_invest(model)
+    postproc.process_sample(model, sample_id='global_optimum')
 
     objective = model.objective
 
@@ -169,9 +169,11 @@ def solve_mga_sampling(model, slack, labels):
 
         altered_model.solve()
 
-        print_invest(altered_model)
+        postproc.process_sample(altered_model, sample_id=label)
 
         print('Objective value: ', old_objective())
+
+    return postproc
 
 
 def print_invest(model):

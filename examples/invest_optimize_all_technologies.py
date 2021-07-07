@@ -61,13 +61,14 @@ import logging
 import os
 import sys
 
+import matplotlib.pyplot as plt
 import pandas as pd
 from oemof import solph
 # Default logger of oemof
 from oemof.tools import economics, logger
 
 sys.path.append("../")
-from mga.mga import solve_mga_sampling
+from mga.mga import solve_mga_sampling, print_invest
 
 number_timesteps = 3
 
@@ -176,5 +177,42 @@ om = solph.Model(energysystem)
 # if tee_switch is true solver messages will be displayed
 logging.info("Solve the optimization problem")
 
-solve_mga_sampling(om, 0.05, labels=['wind', 'pv', 'storage'])
 
+class Postprocessor():
+    def __init__(self):
+        self.results = pd.DataFrame()
+
+    def process_sample(self, model, sample_id):
+            # process and collect
+            results = model.results()
+
+            results = solph.processing.convert_keys_to_strings(results)
+
+            scalars = {key: value['scalars'] for key, value in results.items() if 'scalars' in value}
+
+            invest = {key: value['invest'] for key, value in scalars.items() if 'invest' in value}
+
+            invest = pd.Series(invest)
+
+            # assign sample name
+            invest.name = sample_id
+
+            self.results = pd.concat([self.results, invest], 1)
+
+            print(invest)
+
+
+pproc = solve_mga_sampling(om, 0.05, labels=['wind', 'pv', 'storage'], postproc=Postprocessor())
+
+results = pproc.results
+results.index = pd.MultiIndex.from_tuples(results.index)
+
+global_optimum = results['global_optimum']
+mga_samples = results.drop('global_optimum', 1)
+
+min_max = mga_samples.apply(lambda x: pd.Series([min(x), max(x)], index=['min', 'max']), 1)
+
+fig, ax = plt.subplots()
+global_optimum.plot(ax=ax, linestyle='', marker='*')
+min_max.plot(ax=ax, linestyle='', marker='_', markersize='12')
+plt.show()
