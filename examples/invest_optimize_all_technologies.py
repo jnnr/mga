@@ -90,9 +90,10 @@ price_gas = 0.04
 
 # If the period is one year the equivalent periodical costs (epc) of an
 # investment are equal to the annuity. Use oemof's economic tools.
-epc_wind = economics.annuity(capex=1000, n=20, wacc=0.05)
-epc_pv = economics.annuity(capex=1000, n=20, wacc=0.05)
-epc_storage = economics.annuity(capex=1000, n=20, wacc=0.05)
+epc_wind = economics.annuity(capex=1200, n=25, wacc=0.05)  # Eur/kW
+epc_pv = economics.annuity(capex=700, n=25, wacc=0.05)
+epc_storage_energy = economics.annuity(capex=300, n=15, wacc=0.05)
+epc_pp_gas = economics.annuity(capex=500, n=25, wacc=0.05)
 
 ##########################################################################
 # Create oemof objects
@@ -145,7 +146,7 @@ demand = solph.Sink(
 pp_gas = solph.Transformer(
     label="pp_gas",
     inputs={bgas: solph.Flow()},
-    outputs={bel: solph.Flow(nominal_value=10e10, variable_costs=0)},
+    outputs={bel: solph.Flow(investment=solph.Investment(ep_costs=epc_pp_gas), variable_costs=0)},
     conversion_factors={bel: 0.58},
 )
 
@@ -160,7 +161,7 @@ storage = solph.components.GenericStorage(
     invest_relation_output_capacity=1 / 6,
     inflow_conversion_factor=1,
     outflow_conversion_factor=0.8,
-    investment=solph.Investment(ep_costs=epc_storage),
+    investment=solph.Investment(ep_costs=epc_storage_energy),
 )
 
 energysystem.add(excess, gas_resource, wind, pv, demand, pp_gas, storage)
@@ -202,7 +203,7 @@ class Postprocessor():
             print(invest)
 
 
-pproc = solve_mga_sampling(om, 0.05, labels=['wind', 'pv', 'storage'], postproc=Postprocessor())
+pproc = solve_mga_sampling(om, 0.20, labels=['wind', 'pv', 'storage'], postproc=Postprocessor())
 
 results = pproc.results
 results.index = pd.MultiIndex.from_tuples(results.index)
@@ -215,4 +216,6 @@ min_max = mga_samples.apply(lambda x: pd.Series([min(x), max(x)], index=['min', 
 fig, ax = plt.subplots()
 global_optimum.plot(ax=ax, linestyle='', marker='*')
 min_max.plot(ax=ax, linestyle='', marker='_', markersize='12')
+plt.xticks(rotation=45)
+plt.subplots_adjust(bottom=0.3)
 plt.show()
